@@ -1,0 +1,6 @@
+Metadata-Version: 2.1
+Name: property-file-loader
+Version: 1.0
+Summary: Python script that loads a property file into a Class' dictionary attribute.
+Author: Ryan L. Saplan
+Author-email: ryanlsaplan@gmail.com
