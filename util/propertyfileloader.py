@@ -13,31 +13,27 @@ class PropertyFileLoader:
         self.__load_properties__()
 
     def __load_properties__(self):
+
+        def yield_line():
+            for line in self.__file__:
+                if (line in ['\n', '\n\r']) or (len(line.strip()) == 0) or (line.strip()[0] == '#'):
+                    continue
+
+                if (int(line.find('=')) < 0):
+                    raise ValueError(f'Malformed property file: {line}')
+
+                yield line
+
+        def new_dict(text):
+            key, value = text.split('=')
+            return {f'{key.strip()}': f'{value.strip()}'}
+
+        if not (self.__file__):
+            raise RuntimeError('PropertyFileLoader class was not initialized.')
+
         if isinstance(self.__file__, io.TextIOWrapper):
-            self.__update_properties__(self.__file__)
+
+            for key_value in yield_line():
+                self.properties.update(new_dict(key_value))
         else:
             raise TypeError('Invalid file')
-
-    def __yeild_line__(self, property_file):
-        '''
-        Returns a generator for the opened file and yields line by line.
-        does not return comments and blank lines
-        returns ValueError if property file is malformed.
-        '''
-        for line in property_file:
-            if (line in ['\n', '\n\r']) or (len(line.strip()) == 0) or (line.strip()[0] == '#'):
-                continue
-
-            if (int(line.find('=')) < 0):
-                raise ValueError(f'Malformed property file: {line}')
-
-            yield line
-
-    def __create_property_dict__(self, text):
-        key, value = text.split('=')
-        return {f'{key.strip()}': f'{value.strip()}'}
-
-    def __update_properties__(self, file):
-        for key_value in self.__yeild_line__(file):
-            self.properties.update(
-                self.__create_property_dict__(key_value))
